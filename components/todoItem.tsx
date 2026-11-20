@@ -1,5 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { TodoItemData } from '../App';
+import { Pressable, StyleSheet, Text } from 'react-native';
+
+export type TodoItemData = {
+  id: string;
+  title: string;
+  done: boolean;
+};
 
 type TodoItemProps = {
   item: TodoItemData;

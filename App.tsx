@@ -1,14 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { TodoInput } from './components/todoInput';
-import { TodoItem } from './components/todoItem';
+import { TodoItem, TodoItemData } from './components/todoItem'
 
-export type TodoItemData = {
-  id: string;
-  title: string;
-  done: boolean;
-};
+const STORAGE_KEY = '@todo_list_items';
 
 export default function App() {
   const [todos, setTodos] = useState<TodoItemData[]>([]);
@@ -21,13 +18,44 @@ export default function App() {
     setTodos((prevTodos) => [...prevTodos, newTodo]);
   };
   const handleToggleTodo = (id: string) => {
-    console.log('toggle id:', id);
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
         todo.id === id ? { ...todo, done: !todo.done } : todo
       )
     );
   };
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadTodos = async () => {
+      try {
+        const storedValue = await AsyncStorage.getItem(STORAGE_KEY);
+        if (storedValue !== null) {
+          setTodos(JSON.parse(storedValue) as TodoItemData[]);
+        }
+      } catch (error) {
+        console.error('Failed to load todos:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadTodos();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const saveTodos = async () => {
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+      } catch (error) {
+        console.error('Failed to save todos:', error);
+      }
+    };
+
+    saveTodos();
+  }, [todos, isLoaded]);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Todo List</Text>
@@ -57,8 +85,5 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-  },
-  itemText: {
-    fontSize: 16,
   },
 });
