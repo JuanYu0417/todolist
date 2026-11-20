@@ -1,15 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { TodoItemData } from '../App';
 
 type TodoItemProps = {
   item: TodoItemData;
+  onToggleTodo: (id:string) => void
 };
 
-export function TodoItem({ item }: TodoItemProps) {
+export function TodoItem({ item, onToggleTodo }: TodoItemProps) {
   return (
-    <View style={styles.row}>
-      <Text style={styles.text}>{item.title}</Text>
-    </View>
+    <Pressable style={styles.row} onPress={() => onToggleTodo(item.id)}>
+      <Text style={[styles.text,item.done && styles.doneText]}>{item.title}</Text>
+    </Pressable>
   );
 }
 
@@ -23,5 +24,9 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     color: '#111',
+  },
+  doneText: {
+    textDecorationLine: 'line-through',
+    color: '#999',
   },
 });

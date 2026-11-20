@@ -20,7 +20,14 @@ export default function App() {
     };
     setTodos((prevTodos) => [...prevTodos, newTodo]);
   };
-  
+  const handleToggleTodo = (id: string) => {
+    console.log('toggle id:', id);
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, done: !todo.done } : todo
+      )
+    );
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Todo List</Text>
@@ -28,9 +35,11 @@ export default function App() {
 
       <ScrollView>
         {todos.map((item) => (
-          <Text key={item.id} style={styles.itemText}>
-            • {item.title}
-          </Text>
+          <TodoItem
+            key={item.id}
+            item={item}
+            onToggleTodo={handleToggleTodo}
+          />
         ))}
       </ScrollView>
       <StatusBar style="auto" />
@@ -42,8 +51,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 60,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
